@@ -6,17 +6,15 @@ import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
-
 import { reduceHearts } from "@/actions/user-progress";
 // import { useHeartsModal } from "@/store/use-hearts-modal";
 import { challengeOptions, challenges, userSubscription } from "@/db/schema";
 // import { usePracticeModal } from "@/store/use-practice-modal";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
-
 import { Header } from "./header";
 import { Footer } from "./footer";
 import { Challenge } from "./challenge";
-// import { ResultCard } from "./result-card";
+import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
 
 type Props = {
@@ -49,9 +47,7 @@ Props) => {
   // });
 
   const { width, height } = useWindowSize();
-
   const router = useRouter();
-
   const [finishAudio] = useAudio({ src: "/finish.mp3", autoPlay: true });
   const [correctAudio, _c, correctControls] = useAudio({ src: "/correct.wav" });
   const [incorrectAudio, _i, incorrectControls] = useAudio({
@@ -182,14 +178,8 @@ Props) => {
             Great job! <br /> You&apos;ve completed the lesson.
           </h1>
           <div className="flex items-center gap-x-4 w-full">
-            {/* <ResultCard
-              variant="points"
-              value={challenges.length * 10}
-            />
-            <ResultCard
-              variant="hearts"
-              value={hearts}
-            /> */}
+            <ResultCard variant="points" value={challenges.length * 10} />
+            <ResultCard variant="hearts" value={hearts} />
           </div>
         </div>
         <Footer
