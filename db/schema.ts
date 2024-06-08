@@ -151,3 +151,7 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
     references: [courses.id],
   }),
 }));
+export function userSubscription(userSubscription: any) {
+  throw new Error("Function not implemented.");
+}
+
