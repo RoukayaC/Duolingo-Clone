@@ -108,7 +108,7 @@ export const challengeOptionsRelations = relations(
       fields: [challengeOptions.challengeId],
       references: [challenges.id],
     }),
-  })
+  }),
 );
 
 // CHALLENGE PROGRESS TABLE
@@ -129,7 +129,7 @@ export const challengeProgressRelations = relations(
       fields: [challengeProgress.challengeId],
       references: [challenges.id],
     }),
-  })
+  }),
 );
 
 // USER PROGRESS TABLE
@@ -154,4 +154,3 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
 export function userSubscription(userSubscription: any) {
   throw new Error("Function not implemented.");
 }
-

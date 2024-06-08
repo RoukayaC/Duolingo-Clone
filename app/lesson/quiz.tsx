@@ -66,7 +66,7 @@ Props) => {
   const [challenges] = useState(initialLessonChallenges);
   const [activeIndex, setActiveIndex] = useState(() => {
     const uncompletedIndex = challenges.findIndex(
-      (challenge) => !challenge.completed
+      (challenge) => !challenge.completed,
     );
     return uncompletedIndex === -1 ? 0 : uncompletedIndex;
   });

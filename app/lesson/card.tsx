@@ -54,7 +54,7 @@ export const Card = ({
           status === "wrong" &&
           "border-rose-300 bg-rose-100 hover:bg-rose-100",
         disabled && "pointer-events-none hover:bg-white",
-        type === "ASSIST" && "lg:p-3 w-full"
+        type === "ASSIST" && "lg:p-3 w-full",
       )}
     >
       {audio}
@@ -66,7 +66,7 @@ export const Card = ({
       <div
         className={cn(
           "flex items-center justify-between",
-          type === "ASSIST" && "flex-row-reverse"
+          type === "ASSIST" && "flex-row-reverse",
         )}
       >
         {type === "ASSIST" && <div />}
@@ -75,7 +75,7 @@ export const Card = ({
             "text-neutral-600 text-sm lg:text-base",
             selected && "text-sky-500",
             selected && status === "correct" && "text-green-500",
-            selected && status === "wrong" && "text-rose-500"
+            selected && status === "wrong" && "text-rose-500",
           )}
         >
           {text}
@@ -87,7 +87,7 @@ export const Card = ({
             selected &&
               status === "correct" &&
               "border-green-500 text-green-500",
-            selected && status === "wrong" && "border-rose-500 text-rose-500"
+            selected && status === "wrong" && "border-rose-500 text-rose-500",
           )}
         >
           {shortcut}

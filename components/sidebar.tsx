@@ -13,7 +13,7 @@ export const Sidebar = ({ className }: Props) => {
     <div
       className={cn(
         "flex h-full lg:w-[256px] lg:fixed left-0 top-0 px-4 border-r-2 flex-col",
-        className
+        className,
       )}
     >
       <Link href="/learn">
@@ -42,7 +42,7 @@ export const Sidebar = ({ className }: Props) => {
         <ClerkLoading>
           <Loader className="h-5 w-5 text-muted-foreground animate-spin" />
         </ClerkLoading>
-        
+
         <ClerkLoaded>
           <UserButton afterSignOutUrl="/" />
         </ClerkLoaded>

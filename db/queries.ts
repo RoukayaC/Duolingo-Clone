@@ -124,7 +124,7 @@ export const getCourseProgress = cache(async () => {
           !challenge.challengeProgress ||
           challenge.challengeProgress.length === 0 ||
           challenge.challengeProgress.some(
-            (progress) => progress.completed === false
+            (progress) => progress.completed === false,
           )
         );
       });
@@ -196,11 +196,11 @@ export const getLessonPercentage = cache(async () => {
   }
 
   const completedChallenges = lesson.challenges.filter(
-    (challenge) => challenge.completed
+    (challenge) => challenge.completed,
   );
 
   const percentage = Math.round(
-    (completedChallenges.length / lesson.challenges.length) * 100
+    (completedChallenges.length / lesson.challenges.length) * 100,
   );
   return percentage;
 });
