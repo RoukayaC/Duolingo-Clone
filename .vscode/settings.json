@@ -7,6 +7,7 @@
     "neondatabase",
     "nextjs",
     "Progressdata",
-    "upsert"
+    "upsert",
+    "zustand"
   ]
 }
