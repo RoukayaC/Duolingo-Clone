@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 import db from "@/db/drizzle";
-// import { POINTS_TO_REFILL } from "@/constants";
+import { POINTS_TO_REFILL } from "@/constants";
 import { getCourseById, getUserProgress } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
 
@@ -54,6 +54,7 @@ export const upsertUserProgress = async (courseId: number) => {
   redirect("/learn");
 };
 
+// Function to reduce hearts for a specific challenge
 export const reduceHearts = async (challengeId: number) => {
   const { userId } = await auth();
 
@@ -113,6 +114,7 @@ export const reduceHearts = async (challengeId: number) => {
   revalidatePath(`/lesson/${lessonId}`);
 };
 
+// Function to refill hearts for the user
 export const refillHearts = async () => {
   const currentUserProgress = await getUserProgress();
 
@@ -124,18 +126,20 @@ export const refillHearts = async () => {
     throw new Error("Hearts are already full");
   }
 
-  // if (currentUserProgress.points < POINTS_TO_REFILL) {
-  //   throw new Error("Not enough points");
-  // }
+  if (currentUserProgress.points < POINTS_TO_REFILL) {
+    throw new Error("Not enough points");
+  }
 
-  // await db
-  //   .update(userProgress)
-  //   .set({
-  //     hearts: 5,
-  //     points: currentUserProgress.points - POINTS_TO_REFILL,
-  //   })
-  //   .where(eq(userProgress.user_id, currentUserProgress.user_id));
+  // Update user progress to refill hearts and reduce points
+  await db
+    .update(userProgress)
+    .set({
+      hearts: 5,
+      points: currentUserProgress.points - POINTS_TO_REFILL,
+    })
+    .where(eq(userProgress.user_id, currentUserProgress.user_id));
 
+  // Revalidate cache and update paths
   revalidatePath("/shop");
   revalidatePath("/learn");
   revalidatePath("/quests");
