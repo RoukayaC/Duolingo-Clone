@@ -7,14 +7,14 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 import { reduceHearts } from "@/actions/user-progress";
-// import { useHeartsModal } from "@/store/use-hearts-modal";
-import { challengeOptions, challenges, userSubscription } from "@/db/schema";
-// import { usePracticeModal } from "@/store/use-practice-modal";
+import { useHeartsModal } from "@/store/use-hearts-modal";
+import { usePracticeModal } from "@/store/use-practice-modal";
+import { challengeOptions, challenges } from "@/db/schema";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
 import { Header } from "./header";
 import { Footer } from "./footer";
 import { Challenge } from "./challenge";
-import { ResultCard } from "./result-card";
+// import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
 
 type Props = {
@@ -37,14 +37,14 @@ export const Quiz = ({
   initialLessonChallenges,
 }: // userSubscription,
 Props) => {
-  // const { open: openHeartsModal } = useHeartsModal();
-  // const { open: openPracticeModal } = usePracticeModal();
+  const { open: openHeartsModal } = useHeartsModal();
+  const { open: openPracticeModal } = usePracticeModal();
 
-  // useMount(() => {
-  //   if (initialPercentage === 100) {
-  //     openPracticeModal();
-  //   }
-  // });
+  useMount(() => {
+    if (initialPercentage === 100) {
+      openPracticeModal();
+    }
+  });
 
   const { width, height } = useWindowSize();
   const router = useRouter();
@@ -56,10 +56,13 @@ Props) => {
   const [pending, startTransition] = useTransition();
 
   const [lessonId] = useState(initialLessonId);
+
   const [hearts, setHearts] = useState(initialHearts);
+
   const [percentage, setPercentage] = useState(() => {
     return initialPercentage === 100 ? 0 : initialPercentage;
   });
+
   const [challenges] = useState(initialLessonChallenges);
   const [activeIndex, setActiveIndex] = useState(() => {
     const uncompletedIndex = challenges.findIndex(
@@ -110,10 +113,10 @@ Props) => {
       startTransition(() => {
         upsertChallengeProgress(challenge.id)
           .then((response) => {
-            // if (response?.error === "hearts") {
-            //   openHeartsModal();
-            //   return;
-            // }
+            if (response?.error === "hearts") {
+              openHeartsModal();
+              return;
+            }
 
             correctControls.play();
             setStatus("correct");
@@ -131,8 +134,7 @@ Props) => {
         reduceHearts(challenge.id)
           .then((response) => {
             if (response?.error === "hearts") {
-              //  openHeartsModal();
-              console.error("Missing hearts");
+              openHeartsModal();
               return;
             }
 
@@ -177,10 +179,10 @@ Props) => {
           <h1 className="text-xl lg:text-3xl font-bold text-neutral-700">
             Great job! <br /> You&apos;ve completed the lesson.
           </h1>
-          <div className="flex items-center gap-x-4 w-full">
+          {/* <div className="flex items-center gap-x-4 w-full">
             <ResultCard variant="points" value={challenges.length * 10} />
             <ResultCard variant="hearts" value={hearts} />
-          </div>
+          </div> */}
         </div>
         <Footer
           lessonId={lessonId}
