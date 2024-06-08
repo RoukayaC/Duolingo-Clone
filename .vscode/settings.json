@@ -4,6 +4,7 @@
     "lucide",
     "neondatabase",
     "nextjs",
-    "Progressdata"
+    "Progressdata",
+    "upsert"
   ]
 }
