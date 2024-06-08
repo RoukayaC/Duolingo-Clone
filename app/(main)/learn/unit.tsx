@@ -3,7 +3,7 @@ import { UnitBanner } from "./unit-banner";
 import { LessonButton } from "./lesson-button";
 
 type Props = {
-  id: string;
+  id: number;
   order: number;
   title: string;
   description: string;
@@ -12,7 +12,7 @@ type Props = {
   })[];
   activeLesson:
     | (typeof lessons.$inferSelect & {
-        units: typeof units.$inferSelect;
+        unit: typeof units.$inferSelect;
       })
     | undefined;
   activeLessonPercentage: number;
