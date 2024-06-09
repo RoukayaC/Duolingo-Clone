@@ -1,41 +1,35 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
   serial,
   text,
-  boolean,
   timestamp,
 } from "drizzle-orm/pg-core";
 
-//  COURSES TABLE
 export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   imageSrc: text("image_src").notNull(),
 });
 
-// COURSES RELATIONS
 export const coursesRelations = relations(courses, ({ many }) => ({
   userProgress: many(userProgress),
   units: many(units),
 }));
 
-// UNITS TABLE
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(), //unit 1
-  description: text("description").notNull(), // learn basics of unit 1
+  title: text("title").notNull(), // Unit 1
+  description: text("description").notNull(), // Learn the basics of spanish
   courseId: integer("course_id")
-    .references(() => courses.id, {
-      onDelete: "cascade",
-    })
+    .references(() => courses.id, { onDelete: "cascade" })
     .notNull(),
   order: integer("order").notNull(),
 });
 
-// UNITS RELATIONS
 export const unitsRelations = relations(units, ({ many, one }) => ({
   course: one(courses, {
     fields: [units.courseId],
@@ -44,20 +38,15 @@ export const unitsRelations = relations(units, ({ many, one }) => ({
   lessons: many(lessons),
 }));
 
-// LESSONS TABLE
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
-  description: text("description").notNull(),
   unitId: integer("unit_id")
-    .references(() => units.id, {
-      onDelete: "cascade",
-    })
+    .references(() => units.id, { onDelete: "cascade" })
     .notNull(),
   order: integer("order").notNull(),
 });
 
-// LESSONS RELATIONS
 export const lessonsRelations = relations(lessons, ({ one, many }) => ({
   unit: one(units, {
     fields: [lessons.unitId],
@@ -68,7 +57,6 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
 
 export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
 
-// CHALLENGES TABLE
 export const challenges = pgTable("challenges", {
   id: serial("id").primaryKey(),
   lessonId: integer("lesson_id")
@@ -79,7 +67,6 @@ export const challenges = pgTable("challenges", {
   order: integer("order").notNull(),
 });
 
-// CHALLENGES RELATIONS
 export const challengesRelations = relations(challenges, ({ one, many }) => ({
   lesson: one(lessons, {
     fields: [challenges.lessonId],
@@ -89,7 +76,6 @@ export const challengesRelations = relations(challenges, ({ one, many }) => ({
   challengeProgress: many(challengeProgress),
 }));
 
-// CHALLENGE OPTIONS TABLE
 export const challengeOptions = pgTable("challenge_options", {
   id: serial("id").primaryKey(),
   challengeId: integer("challenge_id")
@@ -101,10 +87,9 @@ export const challengeOptions = pgTable("challenge_options", {
   audioSrc: text("audio_src"),
 });
 
-// CHALLENGES OPTIONS RELATIONS
 export const challengeOptionsRelations = relations(
   challengeOptions,
-  ({ one, many }) => ({
+  ({ one }) => ({
     challenge: one(challenges, {
       fields: [challengeOptions.challengeId],
       references: [challenges.id],
@@ -112,17 +97,15 @@ export const challengeOptionsRelations = relations(
   }),
 );
 
-// CHALLENGE PROGRESS TABLE
 export const challengeProgress = pgTable("challenge_progress", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(), //todo confirm this doesn't break
+  userId: text("userId").notNull(),
   challengeId: integer("challenge_id")
     .references(() => challenges.id, { onDelete: "cascade" })
     .notNull(),
   completed: boolean("completed").notNull().default(false),
 });
 
-// CHALLENGES PROGRESS RELATIONS
 export const challengeProgressRelations = relations(
   challengeProgress,
   ({ one }) => ({
@@ -133,9 +116,8 @@ export const challengeProgressRelations = relations(
   }),
 );
 
-// USER PROGRESS TABLE
 export const userProgress = pgTable("user_progress", {
-  user_id: text("user_id").primaryKey(),
+  userId: text("userId").primaryKey(),
   userName: text("user_name").notNull().default("User"),
   userImageSrc: text("user_image_src").notNull().default("/mascot.svg"),
   activeCourseId: integer("active_course_id").references(() => courses.id, {
@@ -145,7 +127,6 @@ export const userProgress = pgTable("user_progress", {
   points: integer("points").notNull().default(0),
 });
 
-// USER PROGRESS RELATIONS
 export const userProgressRelations = relations(userProgress, ({ one }) => ({
   activeCourse: one(courses, {
     fields: [userProgress.activeCourseId],
@@ -153,10 +134,9 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
   }),
 }));
 
-//USER SUBSCRIPTION
 export const userSubscription = pgTable("user_subscription", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull().unique(),
+  userId: text("userId").notNull().unique(),
   stripeCustomerId: text("stripe_customer_id").notNull().unique(),
   stripeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
   stripePriceId: text("stripe_price_id").notNull(),

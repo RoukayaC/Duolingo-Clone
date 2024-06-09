@@ -1,40 +1,45 @@
 import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
+
 import db from "@/db/drizzle";
 import {
-  courses,
-  userProgress,
-  units,
-  lessons,
   challengeProgress,
+  courses,
+  lessons,
+  units,
+  userProgress,
   userSubscription,
 } from "@/db/schema";
 
 export const getUserProgress = cache(async () => {
   const { userId } = await auth();
+
   if (!userId) {
     return null;
   }
+
   const data = await db.query.userProgress.findFirst({
-    where: eq(userProgress.user_id, userId),
+    where: eq(userProgress.userId, userId),
     with: {
       activeCourse: true,
     },
   });
+
   return data;
 });
 
 export const getUnits = cache(async () => {
   const { userId } = await auth();
   const userProgress = await getUserProgress();
-  if (!userId || !userProgress?.activeCourse) {
+
+  if (!userId || !userProgress?.activeCourseId) {
     return [];
   }
 
   const data = await db.query.units.findMany({
     orderBy: (units, { asc }) => [asc(units.order)],
-    where: eq(units.courseId, userProgress.activeCourse.id),
+    where: eq(units.courseId, userProgress.activeCourseId),
     with: {
       lessons: {
         orderBy: (lessons, { asc }) => [asc(lessons.order)],
@@ -55,10 +60,7 @@ export const getUnits = cache(async () => {
   const normalizedData = data.map((unit) => {
     const lessonsWithCompletedStatus = unit.lessons.map((lesson) => {
       if (lesson.challenges.length === 0) {
-        return {
-          ...lesson,
-          completed: false,
-        };
+        return { ...lesson, completed: false };
       }
 
       const allCompletedChallenges = lesson.challenges.every((challenge) => {
@@ -68,11 +70,10 @@ export const getUnits = cache(async () => {
           challenge.challengeProgress.every((progress) => progress.completed)
         );
       });
-      return {
-        ...lesson,
-        completed: allCompletedChallenges,
-      };
+
+      return { ...lesson, completed: allCompletedChallenges };
     });
+
     return { ...unit, lessons: lessonsWithCompletedStatus };
   });
 
@@ -81,6 +82,7 @@ export const getUnits = cache(async () => {
 
 export const getCourses = cache(async () => {
   const data = await db.query.courses.findMany();
+
   return data;
 });
 
@@ -98,6 +100,7 @@ export const getCourseById = cache(async (courseId: number) => {
       },
     },
   });
+
   return data;
 });
 
@@ -108,6 +111,7 @@ export const getCourseProgress = cache(async () => {
   if (!userId || !userProgress?.activeCourseId) {
     return null;
   }
+
   const unitsInActiveCourse = await db.query.units.findMany({
     orderBy: (units, { asc }) => [asc(units.order)],
     where: eq(units.courseId, userProgress.activeCourseId),
@@ -115,6 +119,7 @@ export const getCourseProgress = cache(async () => {
       lessons: {
         orderBy: (lessons, { asc }) => [asc(lessons.order)],
         with: {
+          unit: true,
           challenges: {
             with: {
               challengeProgress: {
@@ -130,7 +135,6 @@ export const getCourseProgress = cache(async () => {
   const firstUncompletedLesson = unitsInActiveCourse
     .flatMap((unit) => unit.lessons)
     .find((lesson) => {
-      //todo if smthg does not work , ckeck the last if clause
       return lesson.challenges.some((challenge) => {
         return (
           !challenge.challengeProgress ||
@@ -141,6 +145,7 @@ export const getCourseProgress = cache(async () => {
         );
       });
     });
+
   return {
     activeLesson: firstUncompletedLesson,
     activeLessonId: firstUncompletedLesson?.id,
@@ -149,9 +154,11 @@ export const getCourseProgress = cache(async () => {
 
 export const getLesson = cache(async (id?: number) => {
   const { userId } = await auth();
+
   if (!userId) {
     return null;
   }
+
   const courseProgress = await getCourseProgress();
 
   const lessonId = id || courseProgress?.activeLessonId;
@@ -180,7 +187,6 @@ export const getLesson = cache(async (id?: number) => {
   }
 
   const normalizedChallenges = data.challenges.map((challenge) => {
-    //todo if smthg does not work , ckeck the last if clause
     const completed =
       challenge.challengeProgress &&
       challenge.challengeProgress.length > 0 &&
@@ -188,10 +194,8 @@ export const getLesson = cache(async (id?: number) => {
 
     return { ...challenge, completed };
   });
-  return {
-    ...data,
-    challenges: normalizedChallenges,
-  };
+
+  return { ...data, challenges: normalizedChallenges };
 });
 
 export const getLessonPercentage = cache(async () => {
@@ -210,10 +214,10 @@ export const getLessonPercentage = cache(async () => {
   const completedChallenges = lesson.challenges.filter(
     (challenge) => challenge.completed,
   );
-
   const percentage = Math.round(
     (completedChallenges.length / lesson.challenges.length) * 100,
   );
+
   return percentage;
 });
 
@@ -238,6 +242,7 @@ export const getUserSubscription = cache(async () => {
     isActive: !!isActive,
   };
 });
+
 export const getTopTenUsers = cache(async () => {
   const { userId } = await auth();
 
@@ -249,7 +254,7 @@ export const getTopTenUsers = cache(async () => {
     orderBy: (userProgress, { desc }) => [desc(userProgress.points)],
     limit: 10,
     columns: {
-      user_id: true,
+      userId: true,
       userName: true,
       userImageSrc: true,
       points: true,

@@ -1,9 +1,11 @@
-import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
 import Image from "next/image";
+import { Check } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
 type Props = {
-  id: number;
   title: string;
+  id: number;
   imageSrc: string;
   onClick: (id: number) => void;
   disabled?: boolean;
@@ -11,11 +13,11 @@ type Props = {
 };
 
 export const Card = ({
-  id,
   title,
+  id,
   imageSrc,
-  onClick,
   disabled,
+  onClick,
   active,
 }: Props) => {
   return (
@@ -33,12 +35,11 @@ export const Card = ({
           </div>
         )}
       </div>
-
       <Image
         src={imageSrc}
         alt={title}
-        width={93.33}
         height={70}
+        width={93.33}
         className="rounded-lg drop-shadow-md border object-cover"
       />
       <p className="text-neutral-700 text-center font-bold mt-3">{title}</p>

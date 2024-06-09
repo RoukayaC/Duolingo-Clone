@@ -1,10 +1,11 @@
 import Stripe from "stripe";
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+
 import db from "@/db/drizzle";
 import { stripe } from "@/lib/stripe";
-import { NextResponse } from "next/server";
 import { userSubscription } from "@/db/schema";
-import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -19,7 +20,9 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!,
     );
   } catch (error: any) {
-    return new NextResponse(`Webhook error, ${error.message}`, { status: 400 });
+    return new NextResponse(`Webhook error: ${error.message}`, {
+      status: 400,
+    });
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
@@ -46,6 +49,7 @@ export async function POST(req: Request) {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string,
     );
+
     await db
       .update(userSubscription)
       .set({

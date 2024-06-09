@@ -60,7 +60,7 @@ const LeaderboardPage = async () => {
           <Separator className="mb-4 h-0.5 rounded-full" />
           {leaderboard.map((userProgress, index) => (
             <div
-              key={userProgress.user_id}
+              key={userProgress.userId}
               className="flex items-center w-full p-2 px-4 rounded-xl hover:bg-gray-200/50"
             >
               <p className="font-bold text-lime-700 mr-4">{index + 1}</p>

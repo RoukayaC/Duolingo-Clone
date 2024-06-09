@@ -63,7 +63,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
         hearts: Math.min(currentUserProgress.hearts + 1, 5),
         points: currentUserProgress.points + 10,
       })
-      .where(eq(userProgress.user_id, userId));
+      .where(eq(userProgress.userId, userId));
 
     revalidatePath("/learn");
     revalidatePath("/lesson");
@@ -84,7 +84,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
     .set({
       points: currentUserProgress.points + 10,
     })
-    .where(eq(userProgress.user_id, userId));
+    .where(eq(userProgress.userId, userId));
 
   revalidatePath("/learn");
   revalidatePath("/lesson");
